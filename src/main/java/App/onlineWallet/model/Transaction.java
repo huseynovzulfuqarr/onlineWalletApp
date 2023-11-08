@@ -1,20 +1,21 @@
 package App.onlineWallet.model;
 
-import java.util.List;
 
-import javax.persistence.CascadeType;
+
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -25,38 +26,32 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Wallet {
+public class Transaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@NotBlank(message="name can not be blank")
-	@Size(min=2,max = 30)
-	private String name;
+	@Min(1)
+	@NotBlank(message="amount can not be null")
+	private Double amount;
 	
-	@Size(min=2,max = 30)
-	private String accountNumber;
-	@Size(max=100)
 	private String description;
-	
 	@Min(1)
 	@Max(3)
-	private Integer priority;
+	private int type ;//1 for income;2 for expense;3 for transfer
+	@JsonFormat(pattern = "dd-mm-yyyy")
+	private Date transactionDate;	
 	
-	
-	private Double currentBalance;
-	
-	@OneToMany(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER,
-			mappedBy = "wallet",orphanRemoval = true)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="wallet_id",nullable = false)
 	@JsonIgnore
-	private List<Transaction> transactions;
+	private Wallet wallet;
 	
 	
-	public void setBalance() {
-		this.currentBalance=new Double(0);
+	public void setTransactionDate() {
+		this.transactionDate=new Date();
 		
 	}
-	
 	
 
 }
